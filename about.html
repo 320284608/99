@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375px, initial-scale=1.0">
+    <title>关于我们</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/tailwindcss/3.4.16/tailwind.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* 落叶动画 */
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .leaf {
+            position: fixed;
+            top: -10vh;
+            width: 20px;
+            height: 20px;
+            background: url('https://cdn-icons-png.flaticon.com/512/2913/2913464.png') no-repeat center;
+            background-size: contain;
+            animation: fall 10s linear infinite;
+            opacity: 0;
+        }
+        .leaf:nth-child(2) { left: 20%; animation-duration: 12s; animation-delay: 2s; }
+        .leaf:nth-child(3) { left: 40%; animation-duration: 8s; animation-delay: 4s; }
+        .leaf:nth-child(4) { left: 60%; animation-duration: 10s; animation-delay: 6s; }
+        .leaf:nth-child(5) { left: 80%; animation-duration: 12s; animation-delay: 8s; }
+
+        /* 注意事项样式 */
+        .warning {
+            position: relative;
+            padding: 1rem;
+            border-left: 5px solid red;
+            background-color: #fff5f5;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            color: red;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+        .warning-text {
+            color: red;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* 模块样式 */
+        .module {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .module:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .module h2 {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .module p, .module ul {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .module ul {
+            padding-left: 20px;
+        }
+
+        .icon-text {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+
+        .icon-text i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8 text-primary text-center">关于家族树</h1>
+        
+        <div class="module">
+            <div class="warning">
+                <p class="warning-text">⚠️ 本系统包含家族成员个人信息，代码已加密，请勿外传，以免落入不法之人 👽</p>
+            </div>
+        </div>
+
+        <div class="module">
+            <h2 class="font-bold">系统目的</h2>
+            <p>本系统旨在帮助家族成员：</p>
+            <ul class="list-disc pl-6">
+                <li>可视化家族成员关系</li>
+                <li>记录重要家庭信息</li>
+                <li>保存家族历史记忆</li>
+            </ul>
+        </div>
+                
+        <div class="module">
+            <h2 class="font-bold">主要功能</h2>
+            <div class="grid gap-2">
+                <div class="icon-text">
+                    <i class="ri-user-add-line"></i>
+                    成员信息管理
+                </div>
+                <div class="icon-text">
+                    <i class="ri-share-line"></i>
+                    家族关系可视化
+                </div>
+                <div class="icon-text">
+                    <i class="ri-download-line"></i>
+                    留言联系作者，更改内容。
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 添加落叶效果 -->
+    <div class="leaf"></div>
+    <div class="leaf"></div>
+    <div class="leaf"></div>
+    <div class="leaf"></div>
+    <div class="leaf"></div>
+</body>
+</html>

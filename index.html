@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>家族树 · 传承图谱</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        /* ---------- 密码保护样式 ---------- */
+        .password-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            z-index: 1001;
+            text-align: center;
+            width: 350px;
+        }
+        .password-input {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 15px 0;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .password-btn {
+            background: #4CAF50;
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+        .password-btn:hover { background: #45a049; }
+        #password-error {
+            color: #e74c3c;
+            margin: 15px 0 0;
+            display: none;
+            font-size: 14px;
+        }
+
+        /* ---------- 主内容容器 ---------- */
+        .content-container {
+            display: none;
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+
+        /* ---------- 树形容器 ---------- */
+        #tree-container {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        /* 节点样式 */
+        .node rect {
+            fill: #ffffff;
+            stroke: #2c7da0;
+            stroke-width: 2px;
+            rx: 8px;
+            ry: 8px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
+        }
+        .node text {
+            font-size: 14px;
+            dominant-baseline: middle;
+            text-anchor: middle;
+            fill: #1e2f3e;
+            font-weight: 500;
+            pointer-events: none;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Microsoft YaHei";
+        }
+        .link {
+            fill: none;
+            stroke: #b0bec5;
+            stroke-width: 2.2px;
+        }
+        .spouse-group rect {
+            fill: #ffe6f0;
+            stroke: #d81b60;
+            stroke-width: 1.8px;
+        }
+        .spouse-group text {
+            fill: #ad1457;
+            font-weight: 500;
+        }
+        .marriage-link {
+            stroke: #d81b60;
+            stroke-width: 2px;
+            stroke-dasharray: 5, 4;
+        }
+
+        /* 悬浮功能按钮 */
+        .float-action-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #1e88e5, #0d47a1);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1100;
+            transition: transform 0.2s, background 0.2s;
+            border: none;
+            color: white;
+            font-size: 26px;
+        }
+        .float-action-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #0d47a1, #0a2f6c);
+        }
+
+        /* 侧边功能面板 */
+        .feature-panel {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 300px;
+            max-width: 85vw;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+            z-index: 1150;
+            transition: right 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
+            padding: 20px 0 30px 0;
+            border-left: 1px solid rgba(0,0,0,0.08);
+        }
+        .feature-panel.open {
+            right: 0;
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 20px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+        }
+        .panel-header h3 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #1e466e, #0d47a1);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .close-panel {
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            color: #64748b;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        .close-panel:hover {
+            background: #eef2ff;
+        }
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .search-section {
+            background: #f1f5f9;
+            border-radius: 28px;
+            padding: 8px 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-section input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 4px;
+            font-size: 15px;
+            outline: none;
+        }
+        .search-section button {
+            background: #1e88e5;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        .menu-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .menu-group .panel-btn {
+            background: #ffffff;
+            border: 1px solid #e2edf2;
+            border-radius: 48px;
+            padding: 12px 18px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .menu-group .panel-btn:hover {
+            background: #eef2ff;
+        }
+        .panel-btn.about-warning {
+            background: #fff0f0;
+            border-color: #ffcdd2;
+            color: #b71c1c;
+        }
+        .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 8px 0;
+        }
+
+        /* 右键菜单 */
+        .context-menu {
+            position: absolute;
+            background: #fff;
+            border-radius: 14px;
+            padding: 8px 0;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+            z-index: 1200;
+            display: none;
+            min-width: 140px;
+            border: 1px solid #eef2ff;
+        }
+        .context-menu button {
+            width: 100%;
+            padding: 10px 20px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .context-menu button:hover {
+            background: #f1f5f9;
+        }
+
+        /* 模态框通用 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 28px;
+            max-width: 95vw;
+            width: 1100px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+        }
+        .modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid #eef2ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            background: #f8fafc;
+            border-radius: 28px 28px 0 0;
+        }
+        .modal-header button {
+            background: none;
+            border: none;
+            font-size: 26px;
+            cursor: pointer;
+            color: #64748b;
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        /* 联系作者样式 */
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .contact-item i {
+            width: 32px;
+            font-size: 22px;
+            color: #2c7da0;
+        }
+        .copy-btn {
+            margin-left: auto;
+            background: #eef2ff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+        /* 亲属称谓学习专用样式 - 解决手机重叠 */
+        .kinship-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            background: #fefce8;
+            border-radius: 20px;
+            padding: 10px;
+            max-height: 65vh;
+        }
+        .kinship-svg {
+            display: block;
+            margin: 0 auto;
+            background: #fff9ef;
+            border-radius: 16px;
+            min-width: 1000px;  /* 保证横向滚动，避免手机字体重叠 */
+            width: 100%;
+            height: auto;
+        }
+        .generation-note {
+            background: #e6f7ff;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #0050b3;
+            line-height: 1.5;
+        }
+        .generation-note strong {
+            color: #c41d7f;
+        }
+        @media (max-width: 768px) {
+            .kinship-svg {
+                min-width: 900px;
+            }
+            .generation-note {
+                font-size: 11px;
+            }
+            .modal-header {
+                font-size: 1.1rem;
+                padding: 12px 18px;
+            }
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937e6;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 13px;
+            z-index: 2100;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 密码验证界面 -->
+    <div class="password-container" id="password-container">
+        <h2 style="color: #2c3e50; margin-bottom: 25px;">🏮 家族访问授权</h2>
+        <input type="password" id="password-input" class="password-input" placeholder="请输入访问密码" autocomplete="off">
+        <button id="password-btn" class="password-btn">验证身份</button>
+        <div id="password-error"></div>
+    </div>
+
+    <!-- 主内容 -->
+    <div class="content-container" id="content-container">
+        <div class="float-action-btn" id="float-menu-trigger">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <div class="feature-panel" id="feature-panel">
+            <div class="panel-header">
+                <h3><i class="fas fa-tree"></i> 家族功能</h3>
+                <button class="close-panel" id="close-panel-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="panel-content">
+                <div class="search-section">
+                    <i class="fas fa-search" style="color:#78909c;"></i>
+                    <input type="text" id="global-search-input" placeholder="输入姓名... 至少2个字" autocomplete="off">
+                    <button id="global-search-btn">检索</button>
+                </div>
+                <div class="menu-group">
+                    <button id="toggle-spouses-panel" class="panel-btn">
+                        <i class="fas fa-user-friends"></i> <span id="spouse-toggle-text">显示伴侣</span>
+                    </button>
+                    <div class="divider"></div>
+                    <button id="contact-panel-btn" class="panel-btn">
+                        <i class="fas fa-envelope"></i> 联系作者
+                    </button>
+                    <button id="kinship-learning-btn" class="panel-btn">
+                        <i class="fas fa-graduation-cap"></i> 亲属称谓学习
+                    </button>
+                    <button id="message-panel-btn" class="panel-btn">
+                        <i class="fas fa-comment-dots"></i> 留言板
+                    </button>
+                    <button id="biography-panel-btn" class="panel-btn">
+                        <i class="fas fa-book"></i> 人物传记
+                    </button>
+                    <button id="about-panel-btn" class="panel-btn about-warning">
+                        <i class="fas fa-info-circle"></i> 关于 · 保密声明
+                    </button>
+                </div>
+                <div style="font-size:12px; text-align:center; color:#8ba0ae; margin-top: 20px;">
+                    <i class="fas fa-hand-pointer"></i> 右键节点可编辑
+                </div>
+            </div>
+        </div>
+
+        <div id="context-menu" class="context-menu">
+            <button id="add-child"><i class="fas fa-child"></i> 添加子成员</button>
+            <button id="add-spouse"><i class="fas fa-heart"></i> 添加配偶</button>
+            <button id="edit-node"><i class="fas fa-edit"></i> 编辑成员</button>
+            <button id="delete-node"><i class="fas fa-trash-alt"></i> 删除成员</button>
+        </div>
+
+        <div id="tree-container"></div>
+    </div>
+
+    <!-- 联系作者模态框 -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content" style="width: 500px;">
+            <div class="modal-header">
+                <span><i class="fas fa-address-card"></i> 联系作者</span>
+                <button class="close-modal-btn" data-modal="contact-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="contact-item"><i class="fas fa-envelope"></i> <span>邮箱：442774765@qq.com</span><button class="copy-btn" data-clip="442774765@qq.com">复制</button></div>
+                <div class="contact-item"><i class="fab fa-qq"></i> <span>QQ：442774765</span><button class="copy-btn" data-clip="442774765">复制</button></div>
+                <div class="contact-item"><i class="fab fa-weixin"></i> <span>微信：W-BigGod</span><button class="copy-btn" data-clip="W-BigGod">复制</button></div>
+                <div class="contact-item"><i class="fas fa-phone-alt"></i> <span>电话：18124096181</span><button class="copy-btn" data-clip="18124096181">复制</button></div>
+                <div style="margin-top: 18px; font-size:13px; text-align:center;"><i class="fas fa-shield-alt"></i> 家族维护者 · 欢迎交流</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 亲属称谓学习模态框（完善关系 + 上下九代说明） -->
+    <div id="kinship-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span><i class="fas fa-sitemap"></i> 亲属称谓学习 · 家族关系图</span>
+                <button class="close-modal-btn" data-modal="kinship-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 上下九代说明 -->
+                <div class="generation-note">
+                    <strong>📜 上九代：</strong> 鼻祖 → 远祖 → 太祖 → 烈祖 → 天祖 → 高祖 → 曾祖 → 祖父 → 父母 &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <strong>📜 下九代：</strong> 子 → 孙 → 曾孙 → 玄孙 → 来孙 → 晜孙 → 仍孙 → 云孙 → 耳孙
+                </div>
+                <div id="kinship-tree-box" class="kinship-container"></div>
+                <div style="font-size:12px; color:#6c757d; text-align:center; margin-top:12px;">💡 横向滚动查看完整族谱 | 绿色节点为“自己”，蓝色为亲属 | 包含堂表亲、侄甥等完善关系</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="family-data.js"></script>
+    <script>
+        // ---------- 密码模块 ----------
+        const securityConfig = {
+            encodedPassword: 'MjAyNTAxMDE=',
+            maxAttempts: 3,
+            lockTime: 30000
+        };
+        let attempts = 0;
+        let isLocked = false;
+        const passwordBtn = document.getElementById('password-btn');
+        const passwordInput = document.getElementById('password-input');
+        const passwordError = document.getElementById('password-error');
+
+        function showError(msg) {
+            passwordError.textContent = msg;
+            passwordError.style.display = 'block';
+        }
+        function unlockAccess() {
+            document.getElementById('password-container').style.display = 'none';
+            document.getElementById('content-container').style.display = 'block';
+            initFamilyTree();
+        }
+        function handleFailedAttempt() {
+            passwordInput.value = '';
+            attempts++;
+            const remaining = securityConfig.maxAttempts - attempts;
+            if (remaining > 0) showError(`密码错误，剩余尝试次数：${remaining}`);
+            else lockSystem();
+        }
+        function lockSystem() {
+            isLocked = true;
+            showError(`系统已锁定，请等待 ${securityConfig.lockTime / 1000} 秒`);
+            setTimeout(() => {
+                isLocked = false;
+                attempts = 0;
+                passwordError.style.display = 'none';
+            }, securityConfig.lockTime);
+        }
+        passwordBtn.addEventListener('click', () => {
+            if (isLocked) { showError(`系统已锁定，请稍后`); return; }
+            const pwd = passwordInput.value.trim();
+            if (!pwd) { showError('请输入访问密码'); return; }
+            if (btoa(pwd) === securityConfig.encodedPassword) unlockAccess();
+            else handleFailedAttempt();
+        });
+
+        // 全局变量 - 主树
+        let svg, g, tree, root, showSpouses = false;
+        let currentTreeData = null;
+
+        function showWarningMsg() {
+            alert("⚠️ 家族信息保密提示\n\n本系统包含敏感家族数据，请勿外传！\n泄露信息可能被不法分子利用，造成财产损失或隐私泄露。\n\n© 2025 家族树系统");
+        }
+
+        // 搜索
+        function fuzzySearchTree(startNode, keyword) {
+            const results = [];
+            const lowerKeyword = keyword.toLowerCase().replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '');
+            function cleanName(name) {
+                return name.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '').toLowerCase();
+            }
+            function traverse(node) {
+                if (cleanName(node.name).includes(lowerKeyword)) results.push(node);
+                if (node.spouse && cleanName(node.spouse.name).includes(lowerKeyword)) results.push(node.spouse);
+                if (node.children) node.children.forEach(child => traverse(child));
+            }
+            traverse(startNode);
+            return results;
+        }
+        function performSearch() {
+            const keyword = document.getElementById("global-search-input").value.trim();
+            const validKeyword = keyword.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '');
+            if (validKeyword.length < 2) { alert("请输入至少两个有效字符"); return; }
+            if (!currentTreeData) { alert("数据未就绪"); return; }
+            const results = fuzzySearchTree(currentTreeData, keyword);
+            if (results.length > 0) {
+                const firstMatch = results[0].name;
+                const cleanMatch = firstMatch.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '');
+                window.location.href = `profile.html?name=${encodeURIComponent(cleanMatch)}`;
+            } else alert(`未找到包含 "${validKeyword}" 的成员`);
+        }
+
+        // 主树渲染
+        function update(source, duration = 750) {
+            if (!tree || !root) return;
+            tree(root);
+            const nodes = root.descendants();
+            const links = root.links();
+            const node = g.selectAll(".node")
+                .data(nodes, d => d.id || (d.id = ++d3.treeId));
+            node.exit().remove();
+            const nodeEnter = node.enter().append("g")
+                .attr("class", "node")
+                .attr("transform", d => `translate(${source.y0},${source.x0})`)
+                .on("click", (event, d) => toggleChildren(d))
+                .on("contextmenu", showContextMenu);
+            nodeEnter.append("rect").attr("width", 80).attr("height", 30).attr("x", -40).attr("y", -15);
+            nodeEnter.append("text").text(d => d.data.name).attr("dy", "0.3em");
+            const allNodes = nodeEnter.merge(node);
+            allNodes.each(function(d) {
+                const currentGroup = d3.select(this);
+                currentGroup.selectAll(".spouse-group").remove();
+                currentGroup.selectAll(".marriage-link").remove();
+                if (showSpouses && d.data.spouse && d.data.spouse.name) {
+                    const spouseGrp = currentGroup.append("g").attr("class", "spouse-group").attr("transform", "translate(120, 0)");
+                    spouseGrp.append("rect").attr("width", 80).attr("height", 30).attr("x", -40).attr("y", -15).style("fill", "#ffe6f0").style("stroke", "#d81b60");
+                    spouseGrp.append("text").text(d.data.spouse.name).attr("dy", "0.3em").style("fill", "#ad1457");
+                    currentGroup.append("path").attr("class", "marriage-link").attr("d", "M40 0 L80 0").style("stroke", "#d81b60").style("stroke-width", "2").style("stroke-dasharray", "5,4");
+                }
+            });
+            allNodes.transition().duration(duration).attr("transform", d => `translate(${d.y},${d.x})`);
+            const link = g.selectAll(".link").data(links, d => d.target.id);
+            link.enter().insert("path", ".node").attr("class", "link").attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x))
+                .merge(link).transition().duration(duration).attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+            link.exit().remove();
+            nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
+        }
+        function toggleChildren(d) {
+            if (d.children) { d._children = d.children; d.children = null; }
+            else { d.children = d._children; d._children = null; }
+            update(d);
+        }
+        let selectedNode = null;
+        const contextMenu = d3.select("#context-menu");
+        function showContextMenu(event, d) {
+            event.preventDefault();
+            selectedNode = d;
+            contextMenu.style("left", `${event.pageX}px`).style("top", `${event.pageY}px`).style("display", "block");
+        }
+        document.addEventListener("click", () => contextMenu.style("display", "none"));
+
+        function initTreeLayout() {
+            const container = document.getElementById("tree-container");
+            const width = container.clientWidth, height = container.clientHeight - 8;
+            d3.select("#tree-container svg").remove();
+            svg = d3.select("#tree-container").append("svg").attr("width", width).attr("height", height)
+                .call(d3.zoom().scaleExtent([0.4, 2.5]).on("zoom", (event) => { g.attr("transform", event.transform); }))
+                .on("dblclick.zoom", null);
+            g = svg.append("g").attr("transform", "translate(80, 50)");
+            tree = d3.tree().size([height - 100, width - 180]).nodeSize([68, 210]).separation((a, b) => (a.parent === b.parent ? 1 : 1.3));
+            if (currentTreeData) {
+                root = d3.hierarchy(currentTreeData);
+                root.x0 = height / 2;
+                root.y0 = 0;
+                update(root);
+            }
+        }
+        function toggleSpousesDisplay() {
+            showSpouses = !showSpouses;
+            document.getElementById("spouse-toggle-text").innerText = showSpouses ? "隐藏伴侣" : "显示伴侣";
+            if (root) update(root, 400);
+        }
+        let resizeTimer;
+        function handleResize() {
+            if (resizeTimer) clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => { if (currentTreeData && document.getElementById("content-container").style.display === "block") initTreeLayout(); }, 150);
+        }
+
+        // ---------- 亲属称谓学习（完善版，含堂表亲、侄甥等，上下九代说明已展示）----------
+        function renderKinshipTree() {
+            // 构建详细亲属树：以“自己”为核心，涵盖上下九代直系 + 旁系（堂表亲、侄甥等）
+            const kinshipData = {
+                name: "鼻祖",
+                children: [
+                    { name: "远祖", children: [
+                        { name: "太祖", children: [
+                            { name: "烈祖", children: [
+                                { name: "天祖", children: [
+                                    { name: "高祖", children: [
+                                        { name: "曾祖", children: [
+                                            { name: "祖父", children: [
+                                                { name: "父亲", children: [
+                                                    { name: "自己", className: "node--self", children: [
+                                                        { name: "儿子", children: [
+                                                            { name: "孙子", children: [{ name: "曾孙" }, { name: "玄孙" }] },
+                                                            { name: "孙女" }
+                                                        ] },
+                                                        { name: "女儿", children: [
+                                                            { name: "外孙", children: [{ name: "外曾孙" }] },
+                                                            { name: "外孙女" }
+                                                        ] },
+                                                        // 侄子/侄女: 兄弟姐妹的孩子
+                                                        { name: "侄子（兄之子）" },
+                                                        { name: "侄女（兄之女）" }
+                                                    ] },
+                                                    // 父亲的兄弟姐妹及其子女（堂亲）
+                                                    { name: "伯父", children: [{ name: "堂兄" }, { name: "堂弟" }, { name: "堂姐" }, { name: "堂妹" }] },
+                                                    { name: "叔父", children: [{ name: "堂兄" }, { name: "堂弟" }, { name: "堂姐" }, { name: "堂妹" }] },
+                                                    { name: "姑母", children: [{ name: "表兄" }, { name: "表弟" }, { name: "表姐" }, { name: "表妹" }] }
+                                                ] },
+                                                { name: "叔公", children: [{ name: "堂伯父/叔父" }, { name: "堂姑母" }] },
+                                                { name: "姑婆", children: [{ name: "表伯父" }, { name: "表姑母" }] }
+                                            ] },
+                                            { name: "曾外祖父", children: [{ name: "外祖父", children: [{ name: "母亲", children: [
+                                                { name: "舅舅", children: [{ name: "表兄弟" }, { name: "表姐妹" }] },
+                                                { name: "姨妈", children: [{ name: "表兄弟" }, { name: "表姐妹" }] }
+                                            ] }] }] }
+                                        ] }
+                                    ] }
+                                ] }
+                            ] }
+                        ] }
+                    ] },
+                    // 增加母系旁系完整示例
+                    { name: "外高祖父", children: [{ name: "外曾祖父", children: [{ name: "外祖父", children: [{ name: "母亲", children: [
+                        { name: "大舅", children: [{ name: "表哥", className: "" }, { name: "表姐" }] },
+                        { name: "小舅", children: [{ name: "表弟", className: "" }, { name: "表妹" }] },
+                        { name: "大姨", children: [{ name: "姨表兄" }, { name: "姨表妹" }] },
+                        { name: "小姨", children: [{ name: "姨表弟" }, { name: "姨表姐" }] }
+                    ] }] }] }] }
+                ]
+            };
+            const container = document.getElementById("kinship-tree-box");
+            container.innerHTML = "";
+            const svgWidth = 1200;  // 固定宽幅确保手机横向滚动不重叠
+            const svgHeight = 700;
+            const svgElem = d3.select("#kinship-tree-box")
+                .append("svg")
+                .attr("class", "kinship-svg")
+                .attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`)
+                .attr("preserveAspectRatio", "xMinYMid meet")
+                .style("background", "#fff9ef")
+                .style("border-radius", "16px");
+            const gTree = svgElem.append("g").attr("transform", "translate(50,40)");
+            const treeLayout = d3.tree().size([svgHeight - 100, svgWidth - 200]).separation(() => 1.2);
+            const rootNode = d3.hierarchy(kinshipData);
+            treeLayout(rootNode);
+            // 连线
+            gTree.selectAll(".link")
+                .data(rootNode.links())
+                .enter()
+                .append("path")
+                .attr("class", "link")
+                .attr("fill", "none")
+                .attr("stroke", "#94a3b8")
+                .attr("stroke-width", 1.8)
+                .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
+            // 节点组
+            const nodes = gTree.selectAll(".node")
+                .data(rootNode.descendants())
+                .enter()
+                .append("g")
+                .attr("class", d => `node ${d.data.className || ""}`)
+                .attr("transform", d => `translate(${d.y},${d.x})`);
+            // 不同节点样式: 自己用红色圆，其他用蓝色，优化文本长度
+            nodes.append("circle")
+                .attr("r", 6)
+                .attr("fill", d => d.data.className === "node--self" ? "#dc2626" : "#3b82f6")
+                .attr("stroke", "white")
+                .attr("stroke-width", 1.5);
+            nodes.append("text")
+                .attr("dy", 18)
+                .attr("text-anchor", "middle")
+                .style("font-size", "11px")
+                .style("fill", "#1e293b")
+                .style("font-weight", d => d.data.className === "node--self" ? "bold" : "normal")
+                .text(d => d.data.name.length > 8 ? d.data.name.slice(0,7)+"…" : d.data.name);
+        }
+
+        // 模态框与复制
+        function showModal(modalId) { document.getElementById(modalId).classList.add("active"); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove("active"); }
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text);
+            const toast = document.createElement("div");
+            toast.className = "toast-msg";
+            toast.innerText = `已复制: ${text}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 1500);
+        }
+
+        // 主初始化
+        function initFamilyTree() {
+            if (typeof treeData !== "undefined") currentTreeData = JSON.parse(JSON.stringify(treeData));
+            else { alert("家族数据加载失败"); return; }
+            document.getElementById("spouse-toggle-text").innerText = showSpouses ? "隐藏伴侣" : "显示伴侣";
+            initTreeLayout();
+            window.addEventListener("resize", handleResize);
+            document.getElementById("global-search-btn").addEventListener("click", performSearch);
+            document.getElementById("global-search-input").addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(); });
+            document.getElementById("toggle-spouses-panel").addEventListener("click", toggleSpousesDisplay);
+            document.getElementById("contact-panel-btn").addEventListener("click", () => showModal("contact-modal"));
+            document.getElementById("kinship-learning-btn").addEventListener("click", () => {
+                showModal("kinship-modal");
+                setTimeout(() => renderKinshipTree(), 80);
+            });
+            document.getElementById("message-panel-btn").addEventListener("click", () => window.open('message.html', '_blank'));
+            document.getElementById("biography-panel-btn").addEventListener("click", () => window.location.href = 'biography.html');
+            document.getElementById("about-panel-btn").addEventListener("click", showWarningMsg);
+            // 右键菜单功能
+            document.getElementById("add-child").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ if(!selectedNode.data.children) selectedNode.data.children=[]; selectedNode.data.children.push({name:"新成员",note:""}); root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } });
+            document.getElementById("add-spouse").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ let spouse=prompt("配偶姓名:"); if(spouse) { selectedNode.data.spouse={name:spouse}; root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } } });
+            document.getElementById("edit-node").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ let newName=prompt("新姓名:",selectedNode.data.name); if(newName) { selectedNode.data.name=newName; root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } } });
+            document.getElementById("delete-node").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode && selectedNode.parent){ if(confirm(`删除${selectedNode.data.name}?`)){ selectedNode.parent.data.children=selectedNode.parent.data.children.filter(c=>c!==selectedNode.data); root=d3.hierarchy(currentTreeData); update(selectedNode.parent); } } else alert("根节点不可删除"); });
+            document.querySelectorAll(".copy-btn").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); copyToClipboard(btn.getAttribute("data-clip")); }); });
+            document.querySelectorAll(".close-modal-btn").forEach(btn => { btn.addEventListener("click", () => closeModal(btn.getAttribute("data-modal"))); });
+            window.onclick = (e) => { if(e.target.classList.contains("modal")) closeModal(e.target.id); };
+        }
+        d3.treeId = 0;
+        // 侧边栏开关
+        const floatTrigger = document.getElementById("float-menu-trigger");
+        const featurePanel = document.getElementById("feature-panel");
+        const closePanelBtn = document.getElementById("close-panel-btn");
+        function openPanel() { featurePanel.classList.add("open"); }
+        function closePanel() { featurePanel.classList.remove("open"); }
+        if (floatTrigger) floatTrigger.addEventListener("click", (e) => { e.stopPropagation(); featurePanel.classList.contains("open") ? closePanel() : openPanel(); });
+        if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
+        document.addEventListener("click", function(event) {
+            if (featurePanel && featurePanel.classList.contains("open") && !featurePanel.contains(event.target) && !floatTrigger.contains(event.target)) closePanel();
+        });
+    </script>
+</body>
+</html>
