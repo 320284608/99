@@ -275,7 +275,7 @@
             background: #f1f5f9;
         }
 
-        /* 模态框通用 */
+        /* 模态框通用 - 改为全屏大区域 */
         .modal {
             display: none;
             position: fixed;
@@ -283,7 +283,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.8);
             z-index: 2000;
             justify-content: center;
             align-items: center;
@@ -293,23 +293,26 @@
         }
         .modal-content {
             background: #fff;
-            border-radius: 28px;
-            max-width: 95vw;
-            width: 1100px;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+            border-radius: 20px;
+            width: 98vw;
+            height: 94vh;
+            max-width: 98vw;
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.3);
         }
         .modal-header {
-            padding: 18px 24px;
+            padding: 12px 20px;
             border-bottom: 1px solid #eef2ff;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 600;
             background: #f8fafc;
-            border-radius: 28px 28px 0 0;
+            flex-shrink: 0;
         }
         .modal-header button {
             background: none;
@@ -319,9 +322,99 @@
             color: #64748b;
         }
         .modal-body {
-            padding: 20px;
+            flex: 1;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        /* 联系作者样式 */
+        /* 亲属称谓学习专用样式 - 全屏适配 */
+        .kinship-toolbar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .kinship-switch-btn, .zoom-reset-btn, .info-btn {
+            background: #eef2ff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1e466e;
+        }
+        .kinship-switch-btn.active {
+            background: #1e88e5;
+            color: white;
+            box-shadow: 0 2px 8px rgba(30,136,229,0.3);
+        }
+        .zoom-reset-btn {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+        .info-btn {
+            background: #fff3e0;
+            color: #b45309;
+        }
+        .kinship-container {
+            flex: 1;
+            overflow: auto;
+            background: #fefce8;
+            border-radius: 16px;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+            min-height: 0;
+        }
+        .kinship-svg {
+            display: block;
+            background: #fff9ef;
+            border-radius: 12px;
+            cursor: grab;
+        }
+        .kinship-svg:active {
+            cursor: grabbing;
+        }
+        @media (max-width: 768px) {
+            .kinship-switch-btn, .zoom-reset-btn, .info-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .modal-header {
+                padding: 10px 16px;
+                font-size: 1rem;
+            }
+        }
+        .toast-msg {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937e6;
+            color: white;
+            padding: 8px 18px;
+            border-radius: 60px;
+            font-size: 13px;
+            z-index: 2100;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+        /* 亲属节点样式 */
+        .kinship-node circle {
+            fill: #3b82f6;
+            stroke: white;
+            stroke-width: 1.8px;
+            cursor: pointer;
+        }
+        .kinship-node-self circle {
+            fill: #dc2626 !important;
+            stroke: #fff;
+            stroke-width: 2.5px;
+        }
         .contact-item {
             display: flex;
             align-items: center;
@@ -342,61 +435,27 @@
             border-radius: 40px;
             cursor: pointer;
         }
-        /* 亲属称谓学习专用样式 - 解决手机重叠 */
-        .kinship-container {
-            overflow-x: auto;
-            overflow-y: auto;
-            background: #fefce8;
-            border-radius: 20px;
-            padding: 10px;
-            max-height: 65vh;
-        }
-        .kinship-svg {
-            display: block;
-            margin: 0 auto;
-            background: #fff9ef;
-            border-radius: 16px;
-            min-width: 1000px;  /* 保证横向滚动，避免手机字体重叠 */
-            width: 100%;
-            height: auto;
-        }
-        .generation-note {
-            background: #e6f7ff;
-            padding: 12px 16px;
-            border-radius: 20px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #0050b3;
-            line-height: 1.5;
-        }
-        .generation-note strong {
-            color: #c41d7f;
-        }
-        @media (max-width: 768px) {
-            .kinship-svg {
-                min-width: 900px;
-            }
-            .generation-note {
-                font-size: 11px;
-            }
-            .modal-header {
-                font-size: 1.1rem;
-                padding: 12px 18px;
-            }
-        }
-        .toast-msg {
+        /* 说明浮层简单样式 */
+        .info-toast {
             position: fixed;
-            bottom: 100px;
+            bottom: 30%;
             left: 50%;
             transform: translateX(-50%);
-            background: #1f2937e6;
+            background: #2d3e50f2;
+            backdrop-filter: blur(12px);
             color: white;
-            padding: 8px 18px;
-            border-radius: 60px;
+            padding: 14px 20px;
+            border-radius: 28px;
             font-size: 13px;
-            z-index: 2100;
-            backdrop-filter: blur(8px);
+            z-index: 2200;
+            white-space: nowrap;
+            font-family: monospace;
             pointer-events: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            max-width: 90vw;
+            white-space: normal;
+            text-align: center;
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -465,7 +524,7 @@
 
     <!-- 联系作者模态框 -->
     <div id="contact-modal" class="modal">
-        <div class="modal-content" style="width: 500px;">
+        <div class="modal-content" style="width: 500px; height: auto; max-height: 80vh;">
             <div class="modal-header">
                 <span><i class="fas fa-address-card"></i> 联系作者</span>
                 <button class="close-modal-btn" data-modal="contact-modal">&times;</button>
@@ -480,21 +539,22 @@
         </div>
     </div>
 
-    <!-- 亲属称谓学习模态框（完善关系 + 上下九代说明） -->
+    <!-- 亲属称谓学习模态框 - 全屏大图 + 按钮式说明 -->
     <div id="kinship-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <span><i class="fas fa-sitemap"></i> 亲属称谓学习 · 家族关系图</span>
+                <span><i class="fas fa-sitemap"></i> 亲属称谓学习 · 家族关系图谱</span>
                 <button class="close-modal-btn" data-modal="kinship-modal">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- 上下九代说明 -->
-                <div class="generation-note">
-                    <strong>📜 上九代：</strong> 鼻祖 → 远祖 → 太祖 → 烈祖 → 天祖 → 高祖 → 曾祖 → 祖父 → 父母 &nbsp;&nbsp;|&nbsp;&nbsp;
-                    <strong>📜 下九代：</strong> 子 → 孙 → 曾孙 → 玄孙 → 来孙 → 晜孙 → 仍孙 → 云孙 → 耳孙
+                <div class="kinship-toolbar">
+                    <button id="show-patriarchal-btn" class="kinship-switch-btn active">🏛️ 父系 (曾祖父母)</button>
+                    <button id="show-matriarchal-btn" class="kinship-switch-btn">🌸 母系 (外曾祖父母)</button>
+                    <button id="zoom-reset-btn" class="zoom-reset-btn"><i class="fas fa-search-minus"></i> 重置视图</button>
+                    <button id="generation-info-btn" class="info-btn"><i class="fas fa-info-circle"></i> 九代说明</button>
                 </div>
                 <div id="kinship-tree-box" class="kinship-container"></div>
-                <div style="font-size:12px; color:#6c757d; text-align:center; margin-top:12px;">💡 横向滚动查看完整族谱 | 绿色节点为“自己”，蓝色为亲属 | 包含堂表亲、侄甥等完善关系</div>
+                <div style="font-size:11px; color:#6c757d; text-align:center; margin-top:8px; flex-shrink:0;">👆 双指缩放/拖拽 | 红点为“自己”，蓝点为亲属 | 包含姑祖母、表姑、表兄弟、堂姐妹等全系称谓</div>
             </div>
         </div>
     </div>
@@ -503,21 +563,12 @@
     <script src="family-data.js"></script>
     <script>
         // ---------- 密码模块 ----------
-        const securityConfig = {
-            encodedPassword: 'MjAyNTAxMDE=',
-            maxAttempts: 3,
-            lockTime: 30000
-        };
-        let attempts = 0;
-        let isLocked = false;
+        const securityConfig = { encodedPassword: 'MjAyNTAxMDE=', maxAttempts: 3, lockTime: 30000 };
+        let attempts = 0, isLocked = false;
         const passwordBtn = document.getElementById('password-btn');
         const passwordInput = document.getElementById('password-input');
         const passwordError = document.getElementById('password-error');
-
-        function showError(msg) {
-            passwordError.textContent = msg;
-            passwordError.style.display = 'block';
-        }
+        function showError(msg) { passwordError.textContent = msg; passwordError.style.display = 'block'; }
         function unlockAccess() {
             document.getElementById('password-container').style.display = 'none';
             document.getElementById('content-container').style.display = 'block';
@@ -533,11 +584,7 @@
         function lockSystem() {
             isLocked = true;
             showError(`系统已锁定，请等待 ${securityConfig.lockTime / 1000} 秒`);
-            setTimeout(() => {
-                isLocked = false;
-                attempts = 0;
-                passwordError.style.display = 'none';
-            }, securityConfig.lockTime);
+            setTimeout(() => { isLocked = false; attempts = 0; passwordError.style.display = 'none'; }, securityConfig.lockTime);
         }
         passwordBtn.addEventListener('click', () => {
             if (isLocked) { showError(`系统已锁定，请稍后`); return; }
@@ -550,187 +597,63 @@
         // 全局变量 - 主树
         let svg, g, tree, root, showSpouses = false;
         let currentTreeData = null;
-
-        function showWarningMsg() {
-            alert("⚠️ 家族信息保密提示\n\n本系统包含敏感家族数据，请勿外传！\n泄露信息可能被不法分子利用，造成财产损失或隐私泄露。\n\n© 2025 家族树系统");
-        }
-
-        // 搜索
-        function fuzzySearchTree(startNode, keyword) {
-            const results = [];
-            const lowerKeyword = keyword.toLowerCase().replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '');
-            function cleanName(name) {
-                return name.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '').toLowerCase();
-            }
-            function traverse(node) {
-                if (cleanName(node.name).includes(lowerKeyword)) results.push(node);
-                if (node.spouse && cleanName(node.spouse.name).includes(lowerKeyword)) results.push(node.spouse);
-                if (node.children) node.children.forEach(child => traverse(child));
-            }
-            traverse(startNode);
-            return results;
-        }
-        function performSearch() {
-            const keyword = document.getElementById("global-search-input").value.trim();
-            const validKeyword = keyword.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '');
-            if (validKeyword.length < 2) { alert("请输入至少两个有效字符"); return; }
-            if (!currentTreeData) { alert("数据未就绪"); return; }
-            const results = fuzzySearchTree(currentTreeData, keyword);
-            if (results.length > 0) {
-                const firstMatch = results[0].name;
-                const cleanMatch = firstMatch.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '');
-                window.location.href = `profile.html?name=${encodeURIComponent(cleanMatch)}`;
-            } else alert(`未找到包含 "${validKeyword}" 的成员`);
-        }
-
-        // 主树渲染
-        function update(source, duration = 750) {
-            if (!tree || !root) return;
-            tree(root);
-            const nodes = root.descendants();
-            const links = root.links();
-            const node = g.selectAll(".node")
-                .data(nodes, d => d.id || (d.id = ++d3.treeId));
-            node.exit().remove();
-            const nodeEnter = node.enter().append("g")
-                .attr("class", "node")
-                .attr("transform", d => `translate(${source.y0},${source.x0})`)
-                .on("click", (event, d) => toggleChildren(d))
-                .on("contextmenu", showContextMenu);
-            nodeEnter.append("rect").attr("width", 80).attr("height", 30).attr("x", -40).attr("y", -15);
-            nodeEnter.append("text").text(d => d.data.name).attr("dy", "0.3em");
-            const allNodes = nodeEnter.merge(node);
-            allNodes.each(function(d) {
-                const currentGroup = d3.select(this);
-                currentGroup.selectAll(".spouse-group").remove();
-                currentGroup.selectAll(".marriage-link").remove();
-                if (showSpouses && d.data.spouse && d.data.spouse.name) {
-                    const spouseGrp = currentGroup.append("g").attr("class", "spouse-group").attr("transform", "translate(120, 0)");
-                    spouseGrp.append("rect").attr("width", 80).attr("height", 30).attr("x", -40).attr("y", -15).style("fill", "#ffe6f0").style("stroke", "#d81b60");
-                    spouseGrp.append("text").text(d.data.spouse.name).attr("dy", "0.3em").style("fill", "#ad1457");
-                    currentGroup.append("path").attr("class", "marriage-link").attr("d", "M40 0 L80 0").style("stroke", "#d81b60").style("stroke-width", "2").style("stroke-dasharray", "5,4");
-                }
-            });
-            allNodes.transition().duration(duration).attr("transform", d => `translate(${d.y},${d.x})`);
-            const link = g.selectAll(".link").data(links, d => d.target.id);
-            link.enter().insert("path", ".node").attr("class", "link").attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x))
-                .merge(link).transition().duration(duration).attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
-            link.exit().remove();
-            nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; });
-        }
-        function toggleChildren(d) {
-            if (d.children) { d._children = d.children; d.children = null; }
-            else { d.children = d._children; d._children = null; }
-            update(d);
-        }
-        let selectedNode = null;
-        const contextMenu = d3.select("#context-menu");
-        function showContextMenu(event, d) {
-            event.preventDefault();
-            selectedNode = d;
-            contextMenu.style("left", `${event.pageX}px`).style("top", `${event.pageY}px`).style("display", "block");
-        }
+        function showWarningMsg() { alert("⚠️ 家族信息保密提示\n\n本系统包含敏感家族数据，请勿外传！\n泄露信息可能被不法分子利用，造成财产损失或隐私泄露。\n\n© 2025 家族树系统"); }
+        function fuzzySearchTree(startNode, keyword) { const results = []; const lowerKeyword = keyword.toLowerCase().replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, ''); function cleanName(name) { return name.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, '').toLowerCase(); } function traverse(node) { if (cleanName(node.name).includes(lowerKeyword)) results.push(node); if (node.spouse && cleanName(node.spouse.name).includes(lowerKeyword)) results.push(node.spouse); if (node.children) node.children.forEach(child => traverse(child)); } traverse(startNode); return results; }
+        function performSearch() { const keyword = document.getElementById("global-search-input").value.trim(); const validKeyword = keyword.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, ''); if (validKeyword.length < 2) { alert("请输入至少两个有效字符"); return; } if (!currentTreeData) { alert("数据未就绪"); return; } const results = fuzzySearchTree(currentTreeData, keyword); if (results.length > 0) { const firstMatch = results[0].name; const cleanMatch = firstMatch.replace(/[^\p{Script=Han}a-zA-Z0-9]/gu, ''); window.location.href = `profile.html?name=${encodeURIComponent(cleanMatch)}`; } else alert(`未找到包含 "${validKeyword}" 的成员`); }
+        function update(source, duration = 750) { if (!tree || !root) return; tree(root); const nodes = root.descendants(); const links = root.links(); const node = g.selectAll(".node").data(nodes, d => d.id || (d.id = ++d3.treeId)); node.exit().remove(); const nodeEnter = node.enter().append("g").attr("class", "node").attr("transform", d => `translate(${source.y0},${source.x0})`).on("click", (event, d) => toggleChildren(d)).on("contextmenu", showContextMenu); nodeEnter.append("rect").attr("width", 80).attr("height", 30).attr("x", -40).attr("y", -15); nodeEnter.append("text").text(d => d.data.name).attr("dy", "0.3em"); const allNodes = nodeEnter.merge(node); allNodes.each(function(d) { const currentGroup = d3.select(this); currentGroup.selectAll(".spouse-group").remove(); currentGroup.selectAll(".marriage-link").remove(); if (showSpouses && d.data.spouse && d.data.spouse.name) { const spouseGrp = currentGroup.append("g").attr("class", "spouse-group").attr("transform", "translate(120, 0)"); spouseGrp.append("rect").attr("width", 80).attr("height", 30).attr("x", -40).attr("y", -15).style("fill", "#ffe6f0").style("stroke", "#d81b60"); spouseGrp.append("text").text(d.data.spouse.name).attr("dy", "0.3em").style("fill", "#ad1457"); currentGroup.append("path").attr("class", "marriage-link").attr("d", "M40 0 L80 0").style("stroke", "#d81b60").style("stroke-width", "2").style("stroke-dasharray", "5,4"); } }); allNodes.transition().duration(duration).attr("transform", d => `translate(${d.y},${d.x})`); const link = g.selectAll(".link").data(links, d => d.target.id); link.enter().insert("path", ".node").attr("class", "link").attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x)).merge(link).transition().duration(duration).attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x)); link.exit().remove(); nodes.forEach(d => { d.x0 = d.x; d.y0 = d.y; }); }
+        function toggleChildren(d) { if (d.children) { d._children = d.children; d.children = null; } else { d.children = d._children; d._children = null; } update(d); }
+        let selectedNode = null; const contextMenu = d3.select("#context-menu");
+        function showContextMenu(event, d) { event.preventDefault(); selectedNode = d; contextMenu.style("left", `${event.pageX}px`).style("top", `${event.pageY}px`).style("display", "block"); }
         document.addEventListener("click", () => contextMenu.style("display", "none"));
+        function initTreeLayout() { const container = document.getElementById("tree-container"); const width = container.clientWidth, height = container.clientHeight - 8; d3.select("#tree-container svg").remove(); svg = d3.select("#tree-container").append("svg").attr("width", width).attr("height", height).call(d3.zoom().scaleExtent([0.4, 2.5]).on("zoom", (event) => { g.attr("transform", event.transform); })).on("dblclick.zoom", null); g = svg.append("g").attr("transform", "translate(80, 50)"); tree = d3.tree().size([height - 100, width - 180]).nodeSize([68, 210]).separation((a, b) => (a.parent === b.parent ? 1 : 1.3)); if (currentTreeData) { root = d3.hierarchy(currentTreeData); root.x0 = height / 2; root.y0 = 0; update(root); } }
+        function toggleSpousesDisplay() { showSpouses = !showSpouses; document.getElementById("spouse-toggle-text").innerText = showSpouses ? "隐藏伴侣" : "显示伴侣"; if (root) update(root, 400); }
+        let resizeTimer; function handleResize() { if (resizeTimer) clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { if (currentTreeData && document.getElementById("content-container").style.display === "block") initTreeLayout(); }, 150); }
+        function initFamilyTree() { if (typeof treeData !== "undefined") currentTreeData = JSON.parse(JSON.stringify(treeData)); else { alert("家族数据加载失败"); return; } document.getElementById("spouse-toggle-text").innerText = showSpouses ? "隐藏伴侣" : "显示伴侣"; initTreeLayout(); window.addEventListener("resize", handleResize); document.getElementById("global-search-btn").addEventListener("click", performSearch); document.getElementById("global-search-input").addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(); }); document.getElementById("toggle-spouses-panel").addEventListener("click", toggleSpousesDisplay); document.getElementById("contact-panel-btn").addEventListener("click", () => showModal("contact-modal")); document.getElementById("kinship-learning-btn").addEventListener("click", () => { showModal("kinship-modal"); setTimeout(() => renderPatriarchalTree(), 100); }); document.getElementById("message-panel-btn").addEventListener("click", () => window.open('message.html', '_blank')); document.getElementById("biography-panel-btn").addEventListener("click", () => window.location.href = 'biography.html'); document.getElementById("about-panel-btn").addEventListener("click", showWarningMsg); document.getElementById("add-child").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ if(!selectedNode.data.children) selectedNode.data.children=[]; selectedNode.data.children.push({name:"新成员",note:""}); root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } }); document.getElementById("add-spouse").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ let spouse=prompt("配偶姓名:"); if(spouse) { selectedNode.data.spouse={name:spouse}; root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } } }); document.getElementById("edit-node").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ let newName=prompt("新姓名:",selectedNode.data.name); if(newName) { selectedNode.data.name=newName; root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } } }); document.getElementById("delete-node").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode && selectedNode.parent){ if(confirm(`删除${selectedNode.data.name}?`)){ selectedNode.parent.data.children=selectedNode.parent.data.children.filter(c=>c!==selectedNode.data); root=d3.hierarchy(currentTreeData); update(selectedNode.parent); } } else alert("根节点不可删除"); }); document.querySelectorAll(".copy-btn").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); copyToClipboard(btn.getAttribute("data-clip")); }); }); document.querySelectorAll(".close-modal-btn").forEach(btn => { btn.addEventListener("click", () => closeModal(btn.getAttribute("data-modal"))); }); window.onclick = (e) => { if(e.target.classList.contains("modal")) closeModal(e.target.id); }; }
+        d3.treeId = 0;
+        const floatTrigger = document.getElementById("float-menu-trigger"), featurePanel = document.getElementById("feature-panel"), closePanelBtn = document.getElementById("close-panel-btn");
+        function openPanel() { featurePanel.classList.add("open"); } function closePanel() { featurePanel.classList.remove("open"); }
+        if (floatTrigger) floatTrigger.addEventListener("click", (e) => { e.stopPropagation(); featurePanel.classList.contains("open") ? closePanel() : openPanel(); });
+        if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
+        document.addEventListener("click", function(event) { if (featurePanel && featurePanel.classList.contains("open") && !featurePanel.contains(event.target) && !floatTrigger.contains(event.target)) closePanel(); });
+        function showModal(modalId) { document.getElementById(modalId).classList.add("active"); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove("active"); }
+        function copyToClipboard(text) { navigator.clipboard.writeText(text); const toast = document.createElement("div"); toast.className = "toast-msg"; toast.innerText = `已复制: ${text}`; document.body.appendChild(toast); setTimeout(() => toast.remove(), 1500); }
 
-        function initTreeLayout() {
-            const container = document.getElementById("tree-container");
-            const width = container.clientWidth, height = container.clientHeight - 8;
-            d3.select("#tree-container svg").remove();
-            svg = d3.select("#tree-container").append("svg").attr("width", width).attr("height", height)
-                .call(d3.zoom().scaleExtent([0.4, 2.5]).on("zoom", (event) => { g.attr("transform", event.transform); }))
-                .on("dblclick.zoom", null);
-            g = svg.append("g").attr("transform", "translate(80, 50)");
-            tree = d3.tree().size([height - 100, width - 180]).nodeSize([68, 210]).separation((a, b) => (a.parent === b.parent ? 1 : 1.3));
-            if (currentTreeData) {
-                root = d3.hierarchy(currentTreeData);
-                root.x0 = height / 2;
-                root.y0 = 0;
-                update(root);
-            }
-        }
-        function toggleSpousesDisplay() {
-            showSpouses = !showSpouses;
-            document.getElementById("spouse-toggle-text").innerText = showSpouses ? "隐藏伴侣" : "显示伴侣";
-            if (root) update(root, 400);
-        }
-        let resizeTimer;
-        function handleResize() {
-            if (resizeTimer) clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => { if (currentTreeData && document.getElementById("content-container").style.display === "block") initTreeLayout(); }, 150);
-        }
-
-        // ---------- 亲属称谓学习（完善版，含堂表亲、侄甥等，上下九代说明已展示）----------
-        function renderKinshipTree() {
-            // 构建详细亲属树：以“自己”为核心，涵盖上下九代直系 + 旁系（堂表亲、侄甥等）
-            const kinshipData = {
-                name: "鼻祖",
-                children: [
-                    { name: "远祖", children: [
-                        { name: "太祖", children: [
-                            { name: "烈祖", children: [
-                                { name: "天祖", children: [
-                                    { name: "高祖", children: [
-                                        { name: "曾祖", children: [
-                                            { name: "祖父", children: [
-                                                { name: "父亲", children: [
-                                                    { name: "自己", className: "node--self", children: [
-                                                        { name: "儿子", children: [
-                                                            { name: "孙子", children: [{ name: "曾孙" }, { name: "玄孙" }] },
-                                                            { name: "孙女" }
-                                                        ] },
-                                                        { name: "女儿", children: [
-                                                            { name: "外孙", children: [{ name: "外曾孙" }] },
-                                                            { name: "外孙女" }
-                                                        ] },
-                                                        // 侄子/侄女: 兄弟姐妹的孩子
-                                                        { name: "侄子（兄之子）" },
-                                                        { name: "侄女（兄之女）" }
-                                                    ] },
-                                                    // 父亲的兄弟姐妹及其子女（堂亲）
-                                                    { name: "伯父", children: [{ name: "堂兄" }, { name: "堂弟" }, { name: "堂姐" }, { name: "堂妹" }] },
-                                                    { name: "叔父", children: [{ name: "堂兄" }, { name: "堂弟" }, { name: "堂姐" }, { name: "堂妹" }] },
-                                                    { name: "姑母", children: [{ name: "表兄" }, { name: "表弟" }, { name: "表姐" }, { name: "表妹" }] }
-                                                ] },
-                                                { name: "叔公", children: [{ name: "堂伯父/叔父" }, { name: "堂姑母" }] },
-                                                { name: "姑婆", children: [{ name: "表伯父" }, { name: "表姑母" }] }
-                                            ] },
-                                            { name: "曾外祖父", children: [{ name: "外祖父", children: [{ name: "母亲", children: [
-                                                { name: "舅舅", children: [{ name: "表兄弟" }, { name: "表姐妹" }] },
-                                                { name: "姨妈", children: [{ name: "表兄弟" }, { name: "表姐妹" }] }
-                                            ] }] }] }
-                                        ] }
-                                    ] }
-                                ] }
-                            ] }
-                        ] }
-                    ] },
-                    // 增加母系旁系完整示例
-                    { name: "外高祖父", children: [{ name: "外曾祖父", children: [{ name: "外祖父", children: [{ name: "母亲", children: [
-                        { name: "大舅", children: [{ name: "表哥", className: "" }, { name: "表姐" }] },
-                        { name: "小舅", children: [{ name: "表弟", className: "" }, { name: "表妹" }] },
-                        { name: "大姨", children: [{ name: "姨表兄" }, { name: "姨表妹" }] },
-                        { name: "小姨", children: [{ name: "姨表弟" }, { name: "姨表姐" }] }
-                    ] }] }] }] }
-                ]
-            };
+        // ========== 亲属称谓图 - 全屏大图 + 手势缩放 + 说明按钮 ==========
+        let currentKinshipZoom = null, currentKinshipSvg = null;
+        
+        function renderKinshipTreeWithData(rootData) {
             const container = document.getElementById("kinship-tree-box");
             container.innerHTML = "";
-            const svgWidth = 1200;  // 固定宽幅确保手机横向滚动不重叠
-            const svgHeight = 700;
+            // 动态计算宽高：基于容器实际尺寸，但保证足够大以容纳树
+            const containerRect = container.getBoundingClientRect();
+            const baseWidth = Math.max(containerRect.width, 3200);
+            const baseHeight = Math.max(containerRect.height, 2200);
+            const svgWidth = baseWidth;
+            const svgHeight = baseHeight;
+            
             const svgElem = d3.select("#kinship-tree-box")
                 .append("svg")
                 .attr("class", "kinship-svg")
-                .attr("viewBox", `0 0 ${svgWidth} ${svgHeight}`)
-                .attr("preserveAspectRatio", "xMinYMid meet")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight)
                 .style("background", "#fff9ef")
-                .style("border-radius", "16px");
-            const gTree = svgElem.append("g").attr("transform", "translate(50,40)");
-            const treeLayout = d3.tree().size([svgHeight - 100, svgWidth - 200]).separation(() => 1.2);
-            const rootNode = d3.hierarchy(kinshipData);
-            treeLayout(rootNode);
-            // 连线
+                .style("cursor", "grab");
+            
+            const gTree = svgElem.append("g").attr("class", "kinship-zoom-group");
+            
+            // 树布局 - 加大间距防止重叠
+            const treeLayout = d3.tree()
+                .size([svgHeight - 200, svgWidth - 400])
+                .nodeSize([110, 280])
+                .separation((a, b) => (a.parent === b.parent ? 1.6 : 2.0));
+            
+            const root = d3.hierarchy(rootData);
+            treeLayout(root);
+            
+            // 绘制连线
             gTree.selectAll(".link")
-                .data(rootNode.links())
+                .data(root.links())
                 .enter()
                 .append("path")
                 .attr("class", "link")
@@ -738,79 +661,138 @@
                 .attr("stroke", "#94a3b8")
                 .attr("stroke-width", 1.8)
                 .attr("d", d3.linkHorizontal().x(d => d.y).y(d => d.x));
-            // 节点组
+            
+            // 节点
             const nodes = gTree.selectAll(".node")
-                .data(rootNode.descendants())
+                .data(root.descendants())
                 .enter()
                 .append("g")
-                .attr("class", d => `node ${d.data.className || ""}`)
+                .attr("class", d => `node kinship-node ${d.data.isSelf ? "kinship-node-self" : ""}`)
                 .attr("transform", d => `translate(${d.y},${d.x})`);
-            // 不同节点样式: 自己用红色圆，其他用蓝色，优化文本长度
+            
             nodes.append("circle")
-                .attr("r", 6)
-                .attr("fill", d => d.data.className === "node--self" ? "#dc2626" : "#3b82f6")
+                .attr("r", 9)
+                .attr("fill", d => d.data.isSelf ? "#dc2626" : "#3b82f6")
                 .attr("stroke", "white")
-                .attr("stroke-width", 1.5);
+                .attr("stroke-width", 2);
+            
             nodes.append("text")
-                .attr("dy", 18)
+                .attr("dy", 24)
                 .attr("text-anchor", "middle")
-                .style("font-size", "11px")
+                .style("font-size", "12px")
                 .style("fill", "#1e293b")
-                .style("font-weight", d => d.data.className === "node--self" ? "bold" : "normal")
-                .text(d => d.data.name.length > 8 ? d.data.name.slice(0,7)+"…" : d.data.name);
+                .style("font-weight", d => d.data.isSelf ? "bold" : "normal")
+                .style("paint-order", "stroke")
+                .style("stroke", "#fff")
+                .style("stroke-width", "0.8px")
+                .text(d => d.data.name.length > 12 ? d.data.name.slice(0,11)+"…" : d.data.name);
+            
+            // 缩放交互
+            const zoom = d3.zoom()
+                .scaleExtent([0.2, 4.0])
+                .on("zoom", (event) => {
+                    gTree.attr("transform", event.transform);
+                });
+            svgElem.call(zoom);
+            
+            // 根据屏幕宽度动态初始缩放，使图大致居中可见
+            const screenWidth = window.innerWidth;
+            let initScale = 0.45;
+            if (screenWidth < 600) initScale = 0.38;
+            else if (screenWidth < 1000) initScale = 0.42;
+            else initScale = 0.5;
+            const initialTransform = d3.zoomIdentity.translate(120, 100).scale(initScale);
+            svgElem.call(zoom.transform, initialTransform);
+            
+            currentKinshipZoom = zoom;
+            currentKinshipSvg = svgElem;
         }
-
-        // 模态框与复制
-        function showModal(modalId) { document.getElementById(modalId).classList.add("active"); }
-        function closeModal(modalId) { document.getElementById(modalId).classList.remove("active"); }
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-            const toast = document.createElement("div");
-            toast.className = "toast-msg";
-            toast.innerText = `已复制: ${text}`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 1500);
+        
+        function resetKinshipZoom() {
+            if (currentKinshipSvg && currentKinshipZoom) {
+                const screenWidth = window.innerWidth;
+                let initScale = 0.45;
+                if (screenWidth < 600) initScale = 0.38;
+                else if (screenWidth < 1000) initScale = 0.42;
+                else initScale = 0.5;
+                const resetTransform = d3.zoomIdentity.translate(120, 100).scale(initScale);
+                currentKinshipSvg.transition().duration(300).call(currentKinshipZoom.transform, resetTransform);
+            } else {
+                const activeBtn = document.querySelector(".kinship-switch-btn.active");
+                if (activeBtn && activeBtn.id === "show-patriarchal-btn") renderPatriarchalTree();
+                else renderMatriarchalTree();
+            }
         }
-
-        // 主初始化
-        function initFamilyTree() {
-            if (typeof treeData !== "undefined") currentTreeData = JSON.parse(JSON.stringify(treeData));
-            else { alert("家族数据加载失败"); return; }
-            document.getElementById("spouse-toggle-text").innerText = showSpouses ? "隐藏伴侣" : "显示伴侣";
-            initTreeLayout();
-            window.addEventListener("resize", handleResize);
-            document.getElementById("global-search-btn").addEventListener("click", performSearch);
-            document.getElementById("global-search-input").addEventListener("keypress", (e) => { if (e.key === "Enter") performSearch(); });
-            document.getElementById("toggle-spouses-panel").addEventListener("click", toggleSpousesDisplay);
-            document.getElementById("contact-panel-btn").addEventListener("click", () => showModal("contact-modal"));
-            document.getElementById("kinship-learning-btn").addEventListener("click", () => {
-                showModal("kinship-modal");
-                setTimeout(() => renderKinshipTree(), 80);
-            });
-            document.getElementById("message-panel-btn").addEventListener("click", () => window.open('message.html', '_blank'));
-            document.getElementById("biography-panel-btn").addEventListener("click", () => window.location.href = 'biography.html');
-            document.getElementById("about-panel-btn").addEventListener("click", showWarningMsg);
-            // 右键菜单功能
-            document.getElementById("add-child").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ if(!selectedNode.data.children) selectedNode.data.children=[]; selectedNode.data.children.push({name:"新成员",note:""}); root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } });
-            document.getElementById("add-spouse").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ let spouse=prompt("配偶姓名:"); if(spouse) { selectedNode.data.spouse={name:spouse}; root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } } });
-            document.getElementById("edit-node").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode){ let newName=prompt("新姓名:",selectedNode.data.name); if(newName) { selectedNode.data.name=newName; root=d3.hierarchy(currentTreeData); update(selectedNode.parent||root); } } });
-            document.getElementById("delete-node").addEventListener("click", () => { contextMenu.style("display","none"); if(selectedNode && selectedNode.parent){ if(confirm(`删除${selectedNode.data.name}?`)){ selectedNode.parent.data.children=selectedNode.parent.data.children.filter(c=>c!==selectedNode.data); root=d3.hierarchy(currentTreeData); update(selectedNode.parent); } } else alert("根节点不可删除"); });
-            document.querySelectorAll(".copy-btn").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); copyToClipboard(btn.getAttribute("data-clip")); }); });
-            document.querySelectorAll(".close-modal-btn").forEach(btn => { btn.addEventListener("click", () => closeModal(btn.getAttribute("data-modal"))); });
-            window.onclick = (e) => { if(e.target.classList.contains("modal")) closeModal(e.target.id); };
+        
+        function showGenerationInfo() {
+            const msg = "📜 上九代：鼻祖 → 远祖 → 太祖 → 烈祖 → 天祖 → 高祖 → 曾祖 → 祖父 → 父母\n\n📜 下九代：子 → 孙 → 曾孙 → 玄孙 → 来孙 → 晜孙 → 仍孙 → 云孙 → 耳孙\n\n✨ 完整旁系：姑祖母、表姑、表姐妹、表兄弟、表侄、表外甥、堂姑、堂姐妹等全部涵盖。";
+            // 使用自定义toast浮层
+            const toastDiv = document.createElement("div");
+            toastDiv.className = "info-toast";
+            toastDiv.innerText = msg;
+            document.body.appendChild(toastDiv);
+            setTimeout(() => toastDiv.remove(), 4000);
         }
-        d3.treeId = 0;
-        // 侧边栏开关
-        const floatTrigger = document.getElementById("float-menu-trigger");
-        const featurePanel = document.getElementById("feature-panel");
-        const closePanelBtn = document.getElementById("close-panel-btn");
-        function openPanel() { featurePanel.classList.add("open"); }
-        function closePanel() { featurePanel.classList.remove("open"); }
-        if (floatTrigger) floatTrigger.addEventListener("click", (e) => { e.stopPropagation(); featurePanel.classList.contains("open") ? closePanel() : openPanel(); });
-        if (closePanelBtn) closePanelBtn.addEventListener("click", closePanel);
-        document.addEventListener("click", function(event) {
-            if (featurePanel && featurePanel.classList.contains("open") && !featurePanel.contains(event.target) && !floatTrigger.contains(event.target)) closePanel();
+        
+        // 构建父系数据 (完整)
+        function buildPatriarchalTreeData() {
+            return {
+                name: "曾祖父母", children: [
+                    { name: "姑祖母", children: [ { name: "表姑", children: [ { name: "表姐妹", children: [ { name: "表外甥女" }, { name: "表外甥" } ] }, { name: "表兄弟", children: [ { name: "表侄女" }, { name: "表侄" } ] } ] } ] },
+                    { name: "祖父母", children: [
+                        { name: "姑母", children: [ { name: "表姐妹", children: [ { name: "表外甥女", children: [ { name: "表外孙女" }, { name: "表外孙" } ] }, { name: "表外甥", children: [ { name: "表外孙女" }, { name: "表外孙" } ] } ] }, { name: "表兄弟", children: [ { name: "表侄女", children: [ { name: "表外孙女" }, { name: "表外孙" } ] }, { name: "表侄", children: [ { name: "表外孙女" }, { name: "表外孙" } ] } ] } ] },
+                        { name: "伯叔祖父母", children: [ { name: "堂姑", children: [ { name: "表姐妹" }, { name: "表兄弟" } ] }, { name: "堂叔伯", children: [ { name: "堂姐妹" }, { name: "堂兄弟" } ] } ] }
+                    ] },
+                    { name: "父母", children: [
+                        { name: "姐妹", children: [ { name: "外甥女", children: [ { name: "外孙女", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] }, { name: "外孙", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] } ] }, { name: "外甥", children: [ { name: "外孙女" }, { name: "外孙" } ] } ] },
+                        { name: "兄弟", children: [ { name: "侄女", children: [ { name: "侄外孙女", children: [ { name: "侄曾外孙女" }, { name: "侄曾外孙" } ] }, { name: "侄外孙", children: [ { name: "侄曾外孙女" }, { name: "侄曾外孙" } ] } ] }, { name: "侄子", children: [ { name: "侄孙女", children: [ { name: "侄曾外孙女" }, { name: "侄曾外孙" } ] }, { name: "侄孙", children: [ { name: "侄曾孙女" }, { name: "侄曾孙" } ] } ] } ] },
+                        { name: "自己", isSelf: true, children: [
+                            { name: "女儿", children: [ { name: "外孙女", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] }, { name: "外孙", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] } ] },
+                            { name: "儿子", children: [ { name: "孙女", children: [ { name: "曾外孙女" }, { name: "曾外孙子" } ] }, { name: "孙子", children: [ { name: "曾孙女" }, { name: "曾孙子" } ] } ] }
+                        ] },
+                        { name: "伯(叔)父母", children: [ { name: "堂姐妹", children: [ { name: "堂外甥女", children: [ { name: "堂外孙女" }, { name: "堂外孙" } ] }, { name: "堂外甥", children: [ { name: "堂外孙女" }, { name: "堂外孙" } ] } ] }, { name: "堂兄弟", children: [ { name: "堂侄女", children: [ { name: "堂外孙女" }, { name: "堂外孙" } ] }, { name: "堂侄", children: [ { name: "堂侄孙女" }, { name: "堂侄孙" } ] } ] } ] }
+                    ] }
+                ]
+            };
+        }
+        
+        function buildMatriarchalTreeData() {
+            return {
+                name: "外曾祖父母", children: [
+                    { name: "外姑祖母(姑姥姥)", children: [ { name: "表姨母/姨夫", children: [ { name: "表姐妹", children: [ { name: "表外甥女" }, { name: "表外甥" } ] }, { name: "表兄弟", children: [ { name: "表侄女" }, { name: "表侄" } ] } ] } ] },
+                    { name: "外祖父母(姥爷姥姥)", children: [
+                        { name: "姨母/姨夫", children: [ { name: "表姐妹", children: [ { name: "表外甥女", children: [ { name: "表外孙女" }, { name: "表外孙" } ] }, { name: "表外甥", children: [ { name: "表外孙女" }, { name: "表外孙" } ] } ] }, { name: "表兄弟", children: [ { name: "表侄女", children: [ { name: "表外孙女" }, { name: "表外孙" } ] }, { name: "表侄", children: [ { name: "表外孙女" }, { name: "表外孙" } ] } ] } ] },
+                        { name: "舅父/舅母", children: [ { name: "表姐妹", children: [ { name: "表外甥女" }, { name: "表外甥" } ] }, { name: "表兄弟", children: [ { name: "表侄女" }, { name: "表侄" } ] } ] },
+                        { name: "父母", children: [
+                            { name: "姐妹", children: [ { name: "外甥女", children: [ { name: "外孙女", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] }, { name: "外孙", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] } ] }, { name: "外甥", children: [ { name: "外孙女" }, { name: "外孙" } ] } ] },
+                            { name: "兄弟", children: [ { name: "侄女", children: [ { name: "侄外孙女", children: [ { name: "侄曾外孙女" }, { name: "侄曾外孙" } ] }, { name: "侄外孙", children: [ { name: "侄曾外孙女" }, { name: "侄曾外孙" } ] } ] }, { name: "侄子", children: [ { name: "侄孙女", children: [ { name: "侄曾外孙女" }, { name: "侄曾外孙" } ] }, { name: "侄孙", children: [ { name: "侄曾孙女" }, { name: "侄曾孙" } ] } ] } ] },
+                            { name: "自己", isSelf: true, children: [
+                                { name: "女儿", children: [ { name: "外孙女", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] }, { name: "外孙", children: [ { name: "曾外孙女" }, { name: "曾外孙" } ] } ] },
+                                { name: "儿子", children: [ { name: "孙女", children: [ { name: "曾外孙女" }, { name: "曾外孙子" } ] }, { name: "孙子", children: [ { name: "曾孙女" }, { name: "曾孙子" } ] } ] }
+                            ] }
+                        ] }
+                    ] },
+                    { name: "外叔(伯)祖父母", children: [ { name: "表姨母/姨夫", children: [ { name: "表姐妹" }, { name: "表兄弟" } ] }, { name: "舅父/舅母", children: [ { name: "表姐妹" }, { name: "表兄弟" } ] } ] }
+                ]
+            };
+        }
+        
+        function renderPatriarchalTree() { renderKinshipTreeWithData(buildPatriarchalTreeData()); }
+        function renderMatriarchalTree() { renderKinshipTreeWithData(buildMatriarchalTreeData()); }
+        
+        // 绑定按钮事件
+        document.getElementById("show-patriarchal-btn").addEventListener("click", function() {
+            document.getElementById("show-patriarchal-btn").classList.add("active");
+            document.getElementById("show-matriarchal-btn").classList.remove("active");
+            renderPatriarchalTree();
         });
+        document.getElementById("show-matriarchal-btn").addEventListener("click", function() {
+            document.getElementById("show-matriarchal-btn").classList.add("active");
+            document.getElementById("show-patriarchal-btn").classList.remove("active");
+            renderMatriarchalTree();
+        });
+        document.getElementById("zoom-reset-btn").addEventListener("click", resetKinshipZoom);
+        document.getElementById("generation-info-btn").addEventListener("click", showGenerationInfo);
     </script>
 </body>
 </html>
