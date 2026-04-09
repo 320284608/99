@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375px, initial-scale=1.0">
+    <title>联系我们</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.16/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        .contact-icon {
+            color: #2196F3;
+            font-size: 1.5rem;
+        }
+        .contact-item {
+            border-radius: 12px;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .contact-item:hover {
+            background-color: #e0f7fa;
+            transform: translateY(-2px);
+        }
+        .contact-item a {
+            color: #333;
+            text-decoration: none;
+            flex-grow: 1;
+        }
+        .contact-item a:hover {
+            text-decoration: underline;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container">
+        <div class="header">
+            <h1 class="font-bold mb-6">联系我们</h1>
+        </div>
+        
+        <div class="space-y-6">
+            <div>
+                <h2 class="text-xl font-bold mb-2">联系方式</h2>
+                <div class="space-y-4">
+                    <div class="contact-item">
+                        <i class="ri-phone-line contact-icon mr-2"></i>
+                        <a href="tel:18124096181">18124096181</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="ri-mail-line contact-icon mr-2"></i>
+                        <a href="mailto:442774765@qq.com">442774765@qq.com</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="ri-qq-line contact-icon mr-2"></i>
+                        <a href="mqqwpa://im/chat?chat_type=wpa&uin=442774765">QQ: 442774765</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="ri-wechat-line contact-icon mr-2"></i>
+                        <a href="weixin://contacts/profile/W-BigGod">微信: W-BigGod</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="ri-tiktok-line contact-icon mr-2"></i>
+                        <a href="snssdk1128://user/profile/89477677865">抖音: 89477677865</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

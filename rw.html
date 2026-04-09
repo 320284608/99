@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>家族数据编辑器</title>
+    <style>
+        .editor {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #2d3436;
+            font-weight: 600;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #6c5ce7;
+        }
+
+        button {
+            background: #6c5ce7;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108,92,231,0.3);
+        }
+
+        #message {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .preview {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .actions button {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="editor">
+        <h1 style="color: #2d3436; text-align: center; margin-bottom: 2rem;">家族数据编辑器</h1>
+        
+        <div class="form-group">
+            <label>上传数据文件 (family-data.js)</label>
+            <input type="file" id="fileInput" accept=".js">
+        </div>
+
+        <div class="form-group">
+            <label>选择成员</label>
+            <select id="memberSelect" disabled>
+                <option value="">请先上传文件</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>操作类型</label>
+            <select id="actionType">
+                <option value="child">添加儿子</option>
+                <option value="spouse">添加伴侣</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>姓名</label>
+            <input type="text" id="nameInput" placeholder="输入新成员姓名" required>
+        </div>
+
+        <div class="actions">
+            <button onclick="addAction()">添加修改项</button>
+            <button onclick="previewChanges()">预览修改</button>
+        </div>
+
+        <div id="actionList" class="form-group"></div>
+
+        <button onclick="generateNewFile()">生成更新文件</button>
+        <div id="message"></div>
+    </div>
+
+<script>
+// 初始化文件读取
+document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const sanitizedContent = e.target.result
+                .replace(/\/\*[\s\S]*?\*\//g, '') // 移除块注释
+                .replace(/\/\/.*/g, '')          // 移除行注释
+                .replace(/export\s+default/g, '') // 移除导出语句
+                .replace(/const\s+treeData\s*=\s*/, 'return ')
+                .trim();
+
+            window.treeData = new Function(sanitizedContent + '\nreturn treeData;')();
+            initMemberSelect();
+            showMessage('✅ 文件加载成功', 'success');
+        } catch (error) {
+            showMessage(`❌ 文件解析失败: ${error.message}`, 'error');
+        }
+    };
+    reader.readAsText(file);
+});
+
+// 初始化成员选择列表
+function initMemberSelect() {
+    const select = document.getElementById('memberSelect');
+    select.innerHTML = '';
+    select.disabled = false;
+
+    const members = [];
+    function traverse(node) {
+        if (node.name) members.push(node.name);
+        if (node.children) node.children.forEach(traverse);
+    }
+    traverse(window.treeData);
+
+    members.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+}
+
+// 查找成员节点
+function findMember(node, targetName) {
+    if (node.name === targetName) return node;
+    if (node.children) {
+        for (const child of node.children) {
+            const found = findMember(child, targetName);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+// 添加修改项
+function addAction() {
+    const memberName = document.getElementById('memberSelect').value;
+    const actionType = document.getElementById('actionType').value;
+    const newName = document.getElementById('nameInput').value.trim();
+
+    if (!memberName || !newName) {
+        showMessage('⚠️ 请填写完整信息', 'error');
+        return;
+    }
+
+    const actionList = document.getElementById('actionList');
+    const actionItem = document.createElement('div');
+    actionItem.className = 'form-group';
+    actionItem.innerHTML = `
+        <label>成员: ${memberName}，操作: ${actionType}，新姓名: ${newName}</label>
+        <button onclick="removeAction(this)">移除</button>
+    `;
+    actionItem.dataset.member = memberName;
+    actionItem.dataset.action = actionType;
+    actionItem.dataset.name = newName;
+    actionList.appendChild(actionItem);
+
+    document.getElementById('nameInput').value = '';
+}
+
+// 移除修改项
+function removeAction(button) {
+    button.parentElement.remove();
+}
+
+// 预览修改
+function previewChanges() {
+    if (!window.treeData) {
+        showMessage('⚠️ 请先上传数据文件', 'error');
+        return;
+    }
+
+    const actions = document.querySelectorAll('#actionList > div');
+    if (actions.length === 0) {
+        showMessage('⚠️ 没有修改项', 'error');
+        return;
+    }
+
+    const previewData = JSON.parse(JSON.stringify(window.treeData));
+
+    actions.forEach(action => {
+        const memberName = action.dataset.member;
+        const actionType = action.dataset.action;
+        const newName = action.dataset.name;
+
+        const member = findMember(previewData, memberName);
+        if (member) {
+            if (actionType === 'child') {
+                if (!member.children) member.children = [];
+                member.children.push({ name: newName });
+            } else {
+                member.spouse = { name: newName };
+            }
+        }
+    });
+
+    showMessage('🔍 预览成功，请查看控制台', 'preview');
+    console.log('预览修改后的数据:', previewData);
+}
+
+// 生成新文件
+function generateNewFile() {
+    if (!window.treeData) {
+        showMessage('⚠️ 请先上传数据文件', 'error');
+        return;
+    }
+
+    const actions = document.querySelectorAll('#actionList > div');
+    if (actions.length === 0) {
+        showMessage('⚠️ 没有修改项', 'error');
+        return;
+    }
+
+    actions.forEach(action => {
+        const memberName = action.dataset.member;
+        const actionType = action.dataset.action;
+        const newName = action.dataset.name;
+
+        const member = findMember(window.treeData, memberName);
+        if (member) {
+            if (actionType === 'child') {
+                if (!member.children) member.children = [];
+                member.children.push({ name: newName });
+            } else {
+                member.spouse = { name: newName };
+            }
+        }
+    });
+
+    const formatDate = (date) => {
+        return date.toISOString()
+            .replace(/T/, ' ')
+            .replace(/\..+/, '')
+            .replace(/:/g, '-');
+    };
+
+    const header = `// family-data.js\n// 最后更新: ${new Date().toLocaleString()}\n\n`;
+    const formattedData = JSON.stringify(
+        window.treeData,
+        (key, value) => {
+            if (key === 'children' && value.length === 0) return undefined;
+            return value;
+        },
+        4
+    ).replace(/"(\w+)":/g, '$1:');
+
+    const blob = new Blob([header + 'const treeData = ' + formattedData + ';'], {
+        type: 'application/javascript'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `family-data-${formatDate(new Date())}.js`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+
+    showMessage('🎉 修改成功！请下载更新文件', 'success');
+}
+
+// 消息提示
+function showMessage(msg, type = 'success') {
+    const msgDiv = document.getElementById('message');
+    msgDiv.textContent = msg;
+    msgDiv.className = type;
+    setTimeout(() => msgDiv.textContent = '', 5000);
+}
+</script>
+</body>
+</html>
